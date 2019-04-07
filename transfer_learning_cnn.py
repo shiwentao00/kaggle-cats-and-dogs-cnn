@@ -28,49 +28,31 @@ from utils import train_model
 
 # get input parameters for the program
 args = getArgs()
-opMode = args.opMode
 seed = args.seed
-
-if opMode == 'cats_vs_dogs':
-    data_dir = args.data_dir_cats_vs_dogs
-    model_dir = args.model_cats_vs_dogs
-elif opMode == 'cats_vs_control':
-    data_dir = args.data_dir_cats_vs_control
-    model_dir = args.model_cats_vs_control
-elif opMode == 'dogs_vs_control':
-    data_dir = args.data_dir_dogs_vs_control
-    model_dir = args.model_dogs_vs_control
-
+data_dir = args.data_dir
+model_dir = args.model_dir
 batch_size = args.batch_size
 print('batch size: '+str(batch_size))
-
 normalizeDataset = args.normalizeDataset
-
 
 # Detect if we have a GPU available
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print('Current device: '+str(device))
 
 # put data into 3 DataLoaders
-trainloader, valloader = dataPreprocess(batch_size, data_dir, seed, opMode, normalizeDataset)
+trainloader, valloader = dataPreprocess(batch_size, data_dir, seed, normalizeDataset)
 
 # create the data loader dictionary
 dataloaders_dict = {"train": trainloader, "val": valloader}
 
 # the classes
-if opMode == 'cats_vs_dogs':
-    classes = ('cat', 'dog')
-elif opMode == 'cats_vs_control':
-    classes = ('control', 'cat')
-elif opMode == 'dogs_vs_control':
-    classes = ('control', 'dog')
+classes = ('cat', 'dog')
 
 '''
 Train the Neural Network
 '''
 # import the model and training configurations
-if opMode == 'cats_vs_dogs':
-    net, loss_fn, optimizerDict, num_epochs = cats_vs_dogs_config(device)
+net, loss_fn, optimizerDict, num_epochs = cats_vs_dogs_config(device)
 
 # train the neural network
 trained_model, best_mcc_roc, train_acc_history, val_acc_history, train_loss_history, val_loss_history, train_mcc_history, val_mcc_history = train_model(net,

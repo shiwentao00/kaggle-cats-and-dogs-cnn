@@ -1,11 +1,11 @@
 
 '''
-    Generate a saliency map for an image to find the "implicit attention" that
-    the neural networks are paying to. This method is introduced by the paper
-    "Deep Inside Convolutional Networks: Visualising Image Classification
-    Models and Saliency Maps".
-    We use this module to see which part of the protein is important to the neural
-    network to distinguish them.
+Generate a saliency map for an image to find the "implicit attention" that
+the neural networks are paying to. This method is introduced by the paper
+"Deep Inside Convolutional Networks: Visualising Image Classification
+Models and Saliency Maps".
+We use this module to see which part of the protein is important to the neural
+network to distinguish them.
 '''
 
 # import libraries
@@ -26,47 +26,22 @@ def getArgs():
     """    
     parser = argparse.ArgumentParser('python')
 
-    parser.add_argument('-opMode',
-                        default='cats_vs_dogs',
-                        required=False,
-                        choices = ['cats_vs_dogs', 'cats_vs_control', 'dogs_vs_contorl'],
-                        help= 'choices: cats_vs_dogs, cats_vs_control, dogs_vs_contorl')
-    
     parser.add_argument('-index',
                         type=int,
                         default=1,
                         required=False,
                         help='index of the target image')
 
-    parser.add_argument('-data_dir_cats_vs_dogs',
+    parser.add_argument('-data_dir',
                         default='../cat-and-dog/',
                         required=False,
                         help='directory to load data for training, validating and testing.')
 
-    parser.add_argument('-data_dir_cats_vs_control',
-                        default='../cat-and-control',
-                        required=False,
-                        help='directory to load data for training, validating and testing.')
-
-    parser.add_argument('-data_dir_dogs_vs_control',
-                        default='../dog-and-control/',
-                        required=False,
-                        help='directory to load data for 10-fold cross-validation.')
-
-    parser.add_argument('-model_cats_vs_dogs',
+    parser.add_argument('-model_dir',
                         default='./model/cats_vs_dogs_resnet18.pt',
                         required=False,
                         help='file to save the model for cats vs dogs.')
 
-    parser.add_argument('-model_cats_vs_control',
-                        default='./model/cats_vs_control_resnet18.pt',
-                        required=False,
-                        help='file to save the model for control_vs_nucleotide.')
-
-    parser.add_argument('-model_dogs_vs_control',
-                        default='./model/dogs_vs_control_resnet18.pt',
-                        required=False,
-                        help='file to save the model for control_vs_nucleotide.')
     return parser.parse_args()
 
 # define our own dataset class.
@@ -86,9 +61,6 @@ class ImageFolderWithPaths(datasets.ImageFolder):
 
 # the function returns the saliency map of an image
 def saliencyMap(model, image, device, classes):
-    # set model to evaluation mode
-    model.eval()
-
     # send image to gpu
     image.to(device)
 
@@ -159,19 +131,9 @@ def imgGen(dataset, datasetWithNorm, index, classes, model, device):
 
 if __name__ == "__main__":
     args = getArgs()
-    opMode = args.opMode
-    if opMode == 'cats_vs_dogs':
-        data_dir = args.data_dir_cats_vs_dogs
-        model_dir = args.model_cats_vs_dogs
-        classes = ('cat', 'dog')
-    elif opMode == 'cats_vs_control':
-        data_dir = args.data_dir_cats_vs_control
-        model_dir = args.model_cats_vs_control
-        classes = ('control', 'cat')
-    elif opMode == 'dogs_vs_control':
-        data_dir = args.data_dir_dogs_vs_control
-        model_dir = args.model_dogs_vs_control
-        ('control', 'dog')
+    data_dir = args.data_dir
+    model_dir = args.model_dir
+    classes = ('cat', 'dog')
     index = args.index
     batch_size= 1
     print('batch size: '+str(batch_size))
@@ -181,25 +143,23 @@ if __name__ == "__main__":
     print('Current device: '+str(device))
 
     # dataset statistics
-    mean_cats_vs_dogs = [0.4883, 0.4551, 0.4174]
-    std_cats_vs_dogs = [0.2265, 0.2214, 0.2220]
-    if opMode == 'cats_vs_dogs':
-        mean = mean_cats_vs_dogs
-        std = std_cats_vs_dogs
+    mean = [0.4883, 0.4551, 0.4174]
+    std = [0.2265, 0.2214, 0.2220]
 
     # initialize model
     modelName = 'resnet18'
     feature_extracting = False
-    net = make_model(modelName, feature_extracting = feature_extracting, use_pretrained = True)
+    model = make_model(modelName, feature_extracting = feature_extracting, use_pretrained = True)
     if torch.cuda.device_count() > 1:
         print("Using "+str(torch.cuda.device_count())+" GPUs...")
-        net = nn.DataParallel(net)
+        model = nn.DataParallel(model)
 
     # send model to GPU
-    net = net.to(device)
-
+    model = model.to(device)
+    # set model to evaluation mode
+    model.eval()
     # Load trained parameters
-    net.load_state_dict(torch.load(model_dir))
+    model.load_state_dict(torch.load(model_dir))
 
     # define a transform with mean and std, another transform without them.
     image_size = (256, 256)
@@ -212,14 +172,14 @@ if __name__ == "__main__":
     dataset = ImageFolderWithPaths(data_dir+'test_set',transform=transform,target_transform=None)
     datasetWithNorm = ImageFolderWithPaths(data_dir+'test_set',transform=transformWithNorm,target_transform=None)
 
-    imageDspl, imageSaliency, fileName, imgClass, predClass = imgGen(dataset, datasetWithNorm, index, classes, net, device)
+    imageDspl, imageSaliency, fileName, imgClass, predClass = imgGen(dataset, datasetWithNorm, index, classes, model, device)
 
     fig, (ax1, ax2) = plt.subplots(nrows=1,ncols=2,figsize=(14, 7))
     ax1.imshow(imageDspl)
     ax1.set_title('Original picture')
     ax2.imshow(imageSaliency)
     ax2.set_title('Saliency maps')
-    fig.suptitle('task:'+opMode+',type:'+imgClass+',filename: '+ fileName+' predicted class:'+predClass)
+    fig.suptitle('image type:'+imgClass+', filename: '+ fileName+', predicted class:'+predClass)
     # show both figures
-    plt.savefig('./images/'+str(opMode)+'_'+str(imgClass)+str(index)+'.png')
+    plt.savefig('./images/' + str(imgClass) + str(index) + '.png')
     plt.show()

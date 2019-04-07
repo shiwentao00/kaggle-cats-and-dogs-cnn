@@ -25,46 +25,20 @@ def getArgs():
     """    
     parser = argparse.ArgumentParser('python')
 
-    parser.add_argument('-opMode',
-                        default='cats_vs_dogs',
-                        required=False,
-                        choices = ['cats_vs_dogs', 'cats_vs_control', 'dogs_vs_contorl'],
-                        help= 'choices: cats_vs_dogs, cats_vs_control, dogs_vs_contorl')
-    
     parser.add_argument('-seed',
                         default=123,
                         required=False,
                         help='seed for random number generation.')
 
-    parser.add_argument('-data_dir_cats_vs_dogs',
+    parser.add_argument('-data_dir',
                         default='../cat-and-dog/',
                         required=False,
                         help='directory to load data for training, validating and testing.')
 
-    parser.add_argument('-data_dir_cats_vs_control',
-                        default='../cat-and-control',
-                        required=False,
-                        help='directory to load data for training, validating and testing.')
-
-    parser.add_argument('-data_dir_dogs_vs_control',
-                        default='../dog-and-control/',
-                        required=False,
-                        help='directory to load data for 10-fold cross-validation.')
-
-    parser.add_argument('-model_cats_vs_dogs',
+    parser.add_argument('-model_dir',
                         default='./model/cats_vs_dogs_resnet18.pt',
                         required=False,
                         help='file to save the model for cats vs dogs.')
-
-    parser.add_argument('-model_cats_vs_control',
-                        default='./model/cats_vs_control_resnet18.pt',
-                        required=False,
-                        help='file to save the model for control_vs_nucleotide.')
-
-    parser.add_argument('-model_dogs_vs_control',
-                        default='./model/dogs_vs_control_resnet18.pt',
-                        required=False,
-                        help='file to save the model for control_vs_nucleotide.')
 
     parser.add_argument('-batch_size',
                         type=int,
@@ -188,7 +162,7 @@ def cats_vs_dogs_config(device):
 
     return net, loss_fn, optimizerDict, num_epochs
 
-def dataPreprocess(batch_size, data_dir, seed, opMode, normalize):
+def dataPreprocess(batch_size, data_dir, seed, normalize):
     """
     Function to pre-process the data: load data, normalize data, random split data
     with a fixed seed. Return the size of input data points and DataLoaders for training,
@@ -199,12 +173,8 @@ def dataPreprocess(batch_size, data_dir, seed, opMode, normalize):
     torch.manual_seed(seed)
 
     # dataset statistics
-    mean_cats_vs_dogs = [0.4883, 0.4551, 0.4174]
-    std_cats_vs_dogs = [0.2265, 0.2214, 0.2220]
-
-    if opMode == 'cats_vs_dogs':
-        mean = mean_cats_vs_dogs
-        std = std_cats_vs_dogs
+    mean = [0.4883, 0.4551, 0.4174]
+    std = [0.2265, 0.2214, 0.2220]
 
     # define the transforms we need
     # Load the training data again with normalization if needed.
