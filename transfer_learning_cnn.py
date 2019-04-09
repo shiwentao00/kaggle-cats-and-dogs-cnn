@@ -10,6 +10,7 @@
 # import libs
 import torch
 import torchvision
+import argparse
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
@@ -20,14 +21,53 @@ import time
 import copy
 import sklearn.metrics as metrics
 # user defined modules
-from utils import getArgs
 from helper import imshow
 from utils import dataPreprocess
 from utils import cats_vs_dogs_config
 from utils import train_model
 
+def getArgs():
+    """
+    The parser function to set the default vaules of the program parameters or read the new value set by user.
+    """    
+    parser = argparse.ArgumentParser('python')
+
+    parser.add_argument('-op',
+                        default='cat',
+                        required=False,
+                        choices = ['cat', 'dog'],
+                        help='operation mode, cat or dog.')
+
+    parser.add_argument('-seed',
+                        default=123,
+                        required=False,
+                        help='seed for random number generation.')
+
+    parser.add_argument('-data_dir',
+                        default='../data_prep/cats_vs_control/',
+                        required=False,
+                        help='directory to load data for training, validating and testing.')
+
+    parser.add_argument('-model_dir',
+                        default='./model/cats_vs_control_resnet18.pt',
+                        required=False,
+                        help='file to save the model for cats vs dogs.')
+
+    parser.add_argument('-batch_size',
+                        type=int,
+                        default=256,
+                        required=False,
+                        help='the batch size, normally 2^n.')
+
+    parser.add_argument('-normalizeDataset',
+                        default=True,
+                        required=False,
+                        help='whether to normalize dataset')
+    return parser.parse_args()
+
 # get input parameters for the program
 args = getArgs()
+op = args.op
 seed = args.seed
 data_dir = args.data_dir
 model_dir = args.model_dir
@@ -40,7 +80,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print('Current device: '+str(device))
 
 # put data into 3 DataLoaders
-trainloader, valloader = dataPreprocess(batch_size, data_dir, seed, normalizeDataset)
+trainloader, valloader = dataPreprocess(op, batch_size, data_dir, seed, normalizeDataset)
 
 # create the data loader dictionary
 dataloaders_dict = {"train": trainloader, "val": valloader}

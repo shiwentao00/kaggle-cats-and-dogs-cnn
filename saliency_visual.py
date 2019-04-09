@@ -31,14 +31,19 @@ def getArgs():
                         default=1,
                         required=False,
                         help='index of the target image')
+    parser.add_argument('-op',
+                        default='cat',
+                        required=False,
+                        choices = ['cat', 'dog'],
+                        help='operation mode, cat or dog.')
 
     parser.add_argument('-data_dir',
-                        default='../cat-and-dog/',
+                        default='../data_prep/cats_vs_control/',
                         required=False,
                         help='directory to load data for training, validating and testing.')
 
     parser.add_argument('-model_dir',
-                        default='./model/cats_vs_dogs_resnet18.pt',
+                        default='./model/cats_vs_control_resnet18.pt',
                         required=False,
                         help='file to save the model for cats vs dogs.')
 
@@ -131,9 +136,13 @@ def imgGen(dataset, datasetWithNorm, index, classes, model, device):
 
 if __name__ == "__main__":
     args = getArgs()
+    op = args.op
     data_dir = args.data_dir
     model_dir = args.model_dir
-    classes = ('cat', 'dog')
+    if op == 'cat':
+        classes = ('control', 'cat')
+    if op == 'dog':
+        classes = ('control', 'dog')
     index = args.index
     batch_size= 1
     print('batch size: '+str(batch_size))
@@ -169,8 +178,8 @@ if __name__ == "__main__":
                                         transforms.Normalize((mean[0], mean[1], mean[2]),(std[0], std[1], std[2]))
                                        ])
 
-    dataset = ImageFolderWithPaths(data_dir+'test_set',transform=transform,target_transform=None)
-    datasetWithNorm = ImageFolderWithPaths(data_dir+'test_set',transform=transformWithNorm,target_transform=None)
+    dataset = ImageFolderWithPaths(data_dir+'val',transform=transform,target_transform=None)
+    datasetWithNorm = ImageFolderWithPaths(data_dir+'val',transform=transformWithNorm,target_transform=None)
 
     imageDspl, imageSaliency, fileName, imgClass, predClass = imgGen(dataset, datasetWithNorm, index, classes, model, device)
 

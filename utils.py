@@ -25,6 +25,12 @@ def getArgs():
     """    
     parser = argparse.ArgumentParser('python')
 
+    parser.add_argument('-op',
+                        default='cat',
+                        required=False,
+                        choices = ['cat', 'dog'],
+                        help='operation mode, cat or dog.')
+
     parser.add_argument('-seed',
                         default=123,
                         required=False,
@@ -149,10 +155,10 @@ def cats_vs_dogs_config(device):
     learningRateDecay = True
 
     # number of epochs to train the Neural Network
-    num_epochs = 4
+    num_epochs = 5
 
     # learning rate schduler used to implement learning rate decay
-    learningRateScheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[1], gamma=0.1)
+    learningRateScheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[2], gamma=0.1)
 
     # a dictionary contains optimizer, learning rate scheduler
     # and whether to decay learning rate
@@ -162,7 +168,7 @@ def cats_vs_dogs_config(device):
 
     return net, loss_fn, optimizerDict, num_epochs
 
-def dataPreprocess(batch_size, data_dir, seed, normalize):
+def dataPreprocess(op, batch_size, data_dir, seed, normalize):
     """
     Function to pre-process the data: load data, normalize data, random split data
     with a fixed seed. Return the size of input data points and DataLoaders for training,
@@ -173,8 +179,12 @@ def dataPreprocess(batch_size, data_dir, seed, normalize):
     torch.manual_seed(seed)
 
     # dataset statistics
-    mean = [0.4883, 0.4551, 0.4174]
-    std = [0.2265, 0.2214, 0.2220]
+    if op == 'cat':
+        mean = [0.4728, 0.4466, 0.4013]
+        std = [0.2140, 0.2109, 0.2096]
+    elif op== 'dog':
+        mean = [0.4757, 0.4523, 0.4007]
+        std = [0.2111, 0.2057, 0.2036]       
 
     # define the transforms we need
     # Load the training data again with normalization if needed.
@@ -190,12 +200,12 @@ def dataPreprocess(batch_size, data_dir, seed, normalize):
         transform = transforms.Compose([transforms.Resize(image_size), transforms.ToTensor()])
 
     # load training set
-    trainset = torchvision.datasets.ImageFolder(data_dir+'training_set/',
+    trainset = torchvision.datasets.ImageFolder(data_dir+'train/',
                                                transform=transform,
                                                target_transform=None)
 
     # load testing set
-    testset = torchvision.datasets.ImageFolder(data_dir+'test_set/',
+    testset = torchvision.datasets.ImageFolder(data_dir+'val/',
                                                transform=transform,
                                                target_transform=None)
 

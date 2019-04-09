@@ -1,5 +1,17 @@
 '''
-calculate the mean and std of the images in a given ImageFolder
+calculate the mean and std of the images in a given ImageFolder.
+
+cats_vs_control:
+mean: tensor([0.4728, 0.4466, 0.4013])
+std: tensor([0.2140, 0.2109, 0.2096])
+
+dogs_vs_control:
+mean: tensor([0.4757, 0.4523, 0.4007])
+std: tensor([0.2111, 0.2057, 0.2036])
+
+cats_vs_dogs:
+mean = [0.4883, 0.4551, 0.4174]
+std = [0.2265, 0.2214, 0.2220]
 '''
 # import libs
 import torch
@@ -93,5 +105,8 @@ if __name__ == "__main__":
     show_example(dataset)
     show_example(dataset)
     show_example(dataset)
-
+    show_example(dataset)
+    show_example(dataset)
+    show_example(dataset)
+    show_example(dataset)
     dataSetStatistics(data_dir, batch_size)
