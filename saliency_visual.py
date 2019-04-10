@@ -20,6 +20,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from utils import make_model
 from helper import imshow
+
+import scipy.ndimage as ndimage
+
 def getArgs():
     """
     The parser function to set the default vaules of the program parameters or read the new value set by user.
@@ -49,9 +52,9 @@ def getArgs():
 
     return parser.parse_args()
 
-# define our own dataset class.
 class ImageFolderWithPaths(datasets.ImageFolder):
-    """Custom dataset that includes image file paths. Extends
+    """
+    Custom dataset that includes image file paths. Extends
     torchvision.datasets.ImageFolder
     """
     # override the __getitem__ method. this is the method dataloader calls
@@ -64,8 +67,10 @@ class ImageFolderWithPaths(datasets.ImageFolder):
         tuple_with_path = (original_tuple + (path,))
         return tuple_with_path
 
-# the function returns the saliency map of an image
 def saliencyMap(model, image, device, classes):
+    """
+    the function returns the saliency map of an image
+    """   
     # send image to gpu
     image.to(device)
 
@@ -103,16 +108,21 @@ def saliencyMap(model, image, device, classes):
     predClass = classes[int(predIdx)]
     return saliencyMap, predClass
 
-# normalize the saliency map to have more contrast
+
 def saliencyNorm(saliencyMap):
+    """
+    normalize the saliency map to have more contrast    
+    """
     maxPixel = np.amax(saliencyMap)
     minPixel = np.amin(saliencyMap)
     rangePixel = maxPixel - minPixel
     #print('range of pixels:',rangePixel)
     return np.true_divide(saliencyMap, rangePixel)
 
-# returns original image, saliency map and file path
 def imgGen(dataset, datasetWithNorm, index, classes, model, device):
+    """
+    returns original image, saliency map and file path
+    """
     # get an image to display (256*256*3)
     imageDspl, labelDspl, pathDspl  = dataset.__getitem__(index)
     imageDspl = imageDspl.unsqueeze(0)
@@ -133,6 +143,22 @@ def imgGen(dataset, datasetWithNorm, index, classes, model, device):
     imageSaliency, predClass = saliencyMap(model, image, device, classes)
     imageSaliency = saliencyNorm(imageSaliency)
     return imageDspl, imageSaliency, fileName, imgClass, predClass
+
+def overlay_heatmap(img_saliency, img):
+    """
+    cut the saliency map with a threshold th, then smoothe the image
+    """
+    # apply thresh hold
+    #img = (img if img >= th)
+
+    #plt.imshow(img, interpolation='nearest')
+    #plt.show()
+    # Note the 0 sigma for the last axis, we don't wan't to blurr the color planes together!
+    img_saliency = ndimage.gaussian_filter(img_saliency, sigma=(10), order=0)
+    plt.imshow(img)
+    plt.imshow(img_saliency, alpha=0.8)
+    plt.show()
+    return img
 
 if __name__ == "__main__":
     args = getArgs()
@@ -185,12 +211,17 @@ if __name__ == "__main__":
 
     imageDspl, imageSaliency, fileName, imgClass, predClass = imgGen(dataset, datasetWithNorm, index, classes, model, device)
 
-    fig, (ax1, ax2) = plt.subplots(nrows=1,ncols=2,figsize=(14, 7))
+    fig, (ax1, ax2, ax3) = plt.subplots(nrows=1,ncols=3,figsize=(15, 5))
     ax1.imshow(imageDspl)
     ax1.set_title('Original picture')
     ax2.imshow(imageSaliency)
     ax2.set_title('Saliency map')
+    imageSaliency = ndimage.gaussian_filter(imageSaliency, sigma=(10), order=0)
+    ax3.imshow(imageDspl)
+    ax3.imshow(imageSaliency, alpha=0.8)
+    ax3.set_title('Heatmap')
     fig.suptitle('image type:'+imgClass+', filename: '+ fileName+', predicted class:'+predClass)
     # show both figures
     plt.savefig('./images/' + str(imgClass) + str(index) + '.png')
     plt.show()
+
