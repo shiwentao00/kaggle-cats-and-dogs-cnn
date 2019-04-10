@@ -32,18 +32,18 @@ def getArgs():
                         required=False,
                         help='index of the target image')
     parser.add_argument('-op',
-                        default='cat',
+                        default='cat_vs_dog',
                         required=False,
-                        choices = ['cat', 'dog'],
-                        help='operation mode, cat or dog.')
+                        choices = ['cat', 'dog', 'cat_vs_dog'],
+                        help='operation mode, cat or dog or cat_vs_dog.')
 
     parser.add_argument('-data_dir',
-                        default='../data_prep/cats_vs_control/',
+                        default='../data_prep/cats_vs_dogs/',
                         required=False,
                         help='directory to load data for training, validating and testing.')
 
     parser.add_argument('-model_dir',
-                        default='./model/cats_vs_control_resnet18.pt',
+                        default='./model/cats_vs_dogs_resnet18.pt',
                         required=False,
                         help='file to save the model for cats vs dogs.')
 
@@ -141,8 +141,10 @@ if __name__ == "__main__":
     model_dir = args.model_dir
     if op == 'cat':
         classes = ('control', 'cat')
-    if op == 'dog':
+    elif op == 'dog':
         classes = ('control', 'dog')
+    elif op == 'cat_vs_dog':
+        classes = ('cat', 'dog')
     index = args.index
     batch_size= 1
     print('batch size: '+str(batch_size))
@@ -187,7 +189,7 @@ if __name__ == "__main__":
     ax1.imshow(imageDspl)
     ax1.set_title('Original picture')
     ax2.imshow(imageSaliency)
-    ax2.set_title('Saliency maps')
+    ax2.set_title('Saliency map')
     fig.suptitle('image type:'+imgClass+', filename: '+ fileName+', predicted class:'+predClass)
     # show both figures
     plt.savefig('./images/' + str(imgClass) + str(index) + '.png')

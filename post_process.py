@@ -19,9 +19,9 @@ import argparse
 def getArgs():
     parser = argparse.ArgumentParser('python')
     parser.add_argument('-op',
-                        default='cat',
+                        default='cat_vs_dog',
                         required=False,
-                        choices = ['cat', 'dog'],
+                        choices = ['cat', 'dog', 'cat_vs_dog'],
                         help='show results of cross validation for cats vs control or dogs vs control')
     return parser.parse_args()
 

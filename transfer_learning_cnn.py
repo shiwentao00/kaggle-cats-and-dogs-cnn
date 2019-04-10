@@ -6,8 +6,6 @@
  stacked upon the feature extractor, and we fine-tune the entire Neural-Network since the orginal
  CNN is trained on a different data domain(imageNet)
  """
-
-# import libs
 import torch
 import torchvision
 import argparse
@@ -20,13 +18,12 @@ import matplotlib.pyplot as plt
 import time
 import copy
 import sklearn.metrics as metrics
-# user defined modules
 from helper import imshow
 from utils import dataPreprocess
 from utils import cats_vs_dogs_config
 from utils import train_model
 
-def getArgs():
+def get_args():
     """
     The parser function to set the default vaules of the program parameters or read the new value set by user.
     """    
@@ -35,8 +32,8 @@ def getArgs():
     parser.add_argument('-op',
                         default='cat',
                         required=False,
-                        choices = ['cat', 'dog'],
-                        help='operation mode, cat or dog.')
+                        choices = ['cat', 'dog', 'cat_vs_dog'],
+                        help='operation mode, cat or dog or cat_vs_dog.')
 
     parser.add_argument('-seed',
                         default=123,
@@ -44,12 +41,12 @@ def getArgs():
                         help='seed for random number generation.')
 
     parser.add_argument('-data_dir',
-                        default='../data_prep/cats_vs_control/',
+                        default='../data_prep/cats_vs_dogs/',
                         required=False,
                         help='directory to load data for training, validating and testing.')
 
     parser.add_argument('-model_dir',
-                        default='./model/cats_vs_control_resnet18.pt',
+                        default='./model/cats_vs_dogs_resnet18.pt',
                         required=False,
                         help='file to save the model for cats vs dogs.')
 
@@ -66,7 +63,7 @@ def getArgs():
     return parser.parse_args()
 
 # get input parameters for the program
-args = getArgs()
+args = get_args()
 op = args.op
 seed = args.seed
 data_dir = args.data_dir
@@ -84,9 +81,6 @@ trainloader, valloader = dataPreprocess(op, batch_size, data_dir, seed, normaliz
 
 # create the data loader dictionary
 dataloaders_dict = {"train": trainloader, "val": valloader}
-
-# the classes
-classes = ('cat', 'dog')
 
 '''
 Train the Neural Network

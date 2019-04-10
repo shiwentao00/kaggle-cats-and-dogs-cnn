@@ -155,7 +155,7 @@ def cats_vs_dogs_config(device):
     learningRateDecay = True
 
     # number of epochs to train the Neural Network
-    num_epochs = 5
+    num_epochs = 3
 
     # learning rate schduler used to implement learning rate decay
     learningRateScheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[2], gamma=0.1)
@@ -182,9 +182,12 @@ def dataPreprocess(op, batch_size, data_dir, seed, normalize):
     if op == 'cat':
         mean = [0.4728, 0.4466, 0.4013]
         std = [0.2140, 0.2109, 0.2096]
-    elif op== 'dog':
+    elif op == 'dog':
         mean = [0.4757, 0.4523, 0.4007]
-        std = [0.2111, 0.2057, 0.2036]       
+        std = [0.2111, 0.2057, 0.2036]
+    elif op == 'cat_vs_dog':
+        mean = [0.4883, 0.4551, 0.4174]
+        std = [0.2265, 0.2214, 0.2220]       
 
     # define the transforms we need
     # Load the training data again with normalization if needed.
