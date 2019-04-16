@@ -7,6 +7,13 @@ A ResNet-18 which is pretrained on the ImageNet dataset is used to classify betw
 ![alt text](https://github.com/wentaoveggiebird/kaggle-cats-and-dogs/blob/master/images/dog1215.png)
 
 ## Dependencies
+* Python 3.6.8
+* Numpy 1.16.2
+* Pytorch 1.0.1 (GPU version)
+* Matplotlib 3.0.3
+* Torchvision 0.2.1
+* Scikit-learn 0.20.3
+* Scipy 1.2.1
 
 ## Files
 * dataset_statistics.py: calculate the mean and standard deviation of the dataset.
