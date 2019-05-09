@@ -211,17 +211,39 @@ if __name__ == "__main__":
 
     imageDspl, imageSaliency, fileName, imgClass, predClass = imgGen(dataset, datasetWithNorm, index, classes, model, device)
 
-    fig, (ax1, ax2, ax3) = plt.subplots(nrows=1,ncols=3,figsize=(15, 5))
+
+    fig, (ax1, ax2, ax3) = plt.subplots(nrows=3,ncols=1,figsize=(5, 15))
     ax1.imshow(imageDspl)
-    ax1.set_title('Original picture')
+    #ax1.set_title('Original picture')
     ax2.imshow(imageSaliency)
-    ax2.set_title('Saliency map')
+    #ax2.set_title('Saliency map')
     imageSaliency = ndimage.gaussian_filter(imageSaliency, sigma=(10), order=0)
     ax3.imshow(imageDspl)
     ax3.imshow(imageSaliency, alpha=0.8)
-    ax3.set_title('Heatmap')
-    fig.suptitle('image type:'+imgClass+', filename: '+ fileName+', predicted class:'+predClass)
+    #ax3.set_title('Heatmap')
+    #fig.suptitle('image type:'+imgClass+', filename: '+ fileName+', predicted class:'+predClass)
     # show both figures
-    plt.savefig('./images/' + str(imgClass) + str(index) + '.png')
+    
+    # Hide axis
+    ax1.axis('off')
+    ax2.axis('off')
+    ax3.axis('off')
+    
+    # remove numbers on axes
+    ax1.set_yticklabels([])
+    ax1.set_xticklabels([])
+    ax2.set_yticklabels([])
+    ax2.set_xticklabels([])    
+    ax3.set_yticklabels([])
+    ax3.set_xticklabels([])
+
+    fig.subplots_adjust(wspace=-0.3, hspace=-0.3)
+    fig.tight_layout()
+
+    ax1.axes.get_xaxis().set_visible(False)
+    ax1.axes.get_yaxis().set_visible(False)
+    ax1.set_frame_on(False)
+
+    plt.savefig('./images/' + str(imgClass) + str(index) + '.png',bbox_inches='tight', pad_inches=0)
     plt.show()
 
