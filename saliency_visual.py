@@ -237,7 +237,7 @@ if __name__ == "__main__":
     ax3.set_yticklabels([])
     ax3.set_xticklabels([])
 
-    fig.subplots_adjust(wspace=-0.3, hspace=-0.3)
+    fig.subplots_adjust(wspace=-0.2, hspace=-0.2)
     fig.tight_layout()
 
     ax1.axes.get_xaxis().set_visible(False)
