@@ -40,7 +40,7 @@ root/val/dog/
 python transfer_learning_cnn.py -op cat_vs_dog -data_dir path_to_data -model_dir path_to_save_model -batch_size 256
 ```
 
-### 5-fold cross-validation
+### Cross-validation
 * To make sure that the code works, arrange the data in the following manner:  
 ```
 root/cv1/train/cat/
