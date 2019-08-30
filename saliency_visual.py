@@ -34,6 +34,7 @@ def getArgs():
                         default=1,
                         required=False,
                         help='index of the target image')
+
     parser.add_argument('-op',
                         default='cat_vs_dog',
                         required=False,
@@ -244,6 +245,6 @@ if __name__ == "__main__":
     ax1.axes.get_yaxis().set_visible(False)
     ax1.set_frame_on(False)
 
-    plt.savefig('./images/' + str(imgClass) + str(index) + '.png',bbox_inches='tight', pad_inches=0)
+    plt.savefig('./images/' + str(imgClass) + str(index) + '.png',bbox_inches='tight', pad_inches=0, dpi=1024)
     plt.show()
 

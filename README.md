@@ -64,8 +64,11 @@ python post_procees.py -op cat_vs_dog
 ```
 
 ### Visualize saliency map and heatmap
-* First, make sure that 1-fold training is performed and the trained model is saved to *path_to_model*.
-* Visualize an image with index 0:  
+First, make sure that 1-fold training is performed and the trained model is saved to *path_to_model*. Visualize an image with index 0:  
 ```
 python saliency_visual.py -index 0 -op cat_vs_dog -data_dir path_to_data -model_dir path_to_model
+```
+Note that the input data directory should also be changed when the operation mode is changed:
+```
+python saliency_visual.py -index 0 -op cat -data_dir path_to_data_cat_vs_control -model_dir path_to_model
 ```
