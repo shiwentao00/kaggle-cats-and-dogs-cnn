@@ -1,4 +1,4 @@
-# kaggle-cats-and-dogs
+# Cats and Dogs classification
 Train ResNet-18 CNN to perform binary classification on the [cats-and-dogs dataset](https://www.kaggle.com/tongpython/cat-and-dog) from Kaggle. 
 
 ## Description
